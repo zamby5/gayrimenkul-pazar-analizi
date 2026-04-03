@@ -1,0 +1,15 @@
+{
+  "name": "gayrimenkul-pazar-analizi",
+  "version": "2.0.0",
+  "description": "Turyap Queen — Profesyonel Gayrimenkul Pazar Analizi",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2024-01-01",
+    "deploy": "wrangler pages deploy public",
+    "build": "echo 'Static site — no build step required'"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "keywords": ["gayrimenkul", "real-estate", "valuation", "turkey", "cloudflare-pages"],
+  "license": "UNLICENSED"
+}

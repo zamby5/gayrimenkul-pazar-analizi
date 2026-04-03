@@ -1,0 +1,21 @@
+name = "gayrimenkul-pazar-analizi"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "public"
+
+[vars]
+APP_NAME    = "Gayrimenkul Pazar Analizi"
+APP_VERSION = "2.0.0"
+BRAND       = "Turyap Queen"
+
+# ──────────────────────────────────────────────
+# Secrets — Cloudflare Dashboard'dan ekleyin:
+#   Settings → Environment Variables → Add secret
+#
+#   GROK_API_KEY    → xAI Grok API anahtarı   (birincil)
+#   GEMINI_API_KEY  → Google Gemini API key    (yedek)
+#   GOOGLE_MAPS_API_KEY → Street View proxy için (opsiyonel)
+#
+# CLI ile eklemek için:
+#   npx wrangler pages secret put GROK_API_KEY --project-name gayrimenkul-pazar-analizi
+#   npx wrangler pages secret put GEMINI_API_KEY --project-name gayrimenkul-pazar-analizi
+# ──────────────────────────────────────────────

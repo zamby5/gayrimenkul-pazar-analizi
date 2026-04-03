@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gayrimenkul Pazar Analizi | Turyap Queen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-brand">
+    <span class="brand-main">TURYAP QUEEN</span>
+    <span class="brand-divider">|</span>
+    <span class="brand-sub">Gayrimenkul Pazar Analizi</span>
+  </div>
+  <div class="header-meta">
+    <span class="header-date" id="headerDate"></span>
+    <span class="header-badge">v2.0</span>
+  </div>
+</header>
+
+<!-- MAIN LAYOUT -->
+<div class="app-layout">
+
+  <!-- LEFT SIDEBAR: INPUT PANEL -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+
+      <!-- SECTION: TAŞINMAZ BİLGİLERİ -->
+      <div class="panel-section">
+        <div class="section-header">
+          <span class="section-icon">◈</span>
+          <span class="section-title">Taşınmaz Bilgileri</span>
+        </div>
+
+        <!-- TKGM TOGGLE -->
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="tkgmToggle" class="toggle-input">
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-text">TKGM Sorgula</span>
+          </label>
+          <span class="badge badge-live" id="tkgmBadge" style="display:none">WFS</span>
+        </div>
+
+        <!-- TKGM ADA/PARSEL (hidden by default) -->
+        <div class="tkgm-panel" id="tkgmPanel" style="display:none">
+          <div class="input-row-2">
+            <div class="input-group">
+              <label class="input-label">Ada No</label>
+              <input type="text" id="adaNo" class="input-field" placeholder="Ada">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Parsel No</label>
+              <input type="text" id="parselNo" class="input-field" placeholder="Parsel">
+            </div>
+          </div>
+          <button class="btn btn-outline-gold btn-sm" id="tkgmQueryBtn">
+            <span class="btn-icon">⊕</span> TKGM Sorgula
+          </button>
+          <div class="tkgm-result" id="tkgmResult" style="display:none"></div>
+        </div>
+
+        <!-- IL / ILCE CASCADE -->
+        <div class="input-group">
+          <label class="input-label">İl</label>
+          <div class="select-wrapper">
+            <select id="ilSelect" class="input-field select-field">
+              <option value="">— İl Seçiniz —</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">İlçe</label>
+          <div class="select-wrapper">
+            <select id="ilceSelect" class="input-field select-field" disabled>
+              <option value="">— İlçe Seçiniz —</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Mahalle / Köy</label>
+          <input type="text" id="mahalleInput" class="input-field" placeholder="Mahalle adı giriniz">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Cadde / Sokak <span class="input-optional">(isteğe bağlı)</span></label>
+          <input type="text" id="adresInput" class="input-field" placeholder="Cadde veya sokak">
+        </div>
+      </div>
+
+      <!-- SECTION: TAŞINMAZ ÖZELLİKLERİ -->
+      <div class="panel-section">
+        <div class="section-header">
+          <span class="section-icon">◈</span>
+          <span class="section-title">Taşınmaz Özellikleri</span>
+        </div>
+
+        <!-- TİP SEÇİMİ -->
+        <div class="input-group">
+          <label class="input-label">Taşınmaz Tipi</label>
+          <div class="select-wrapper">
+            <select id="tipiSelect" class="input-field select-field">
+              <option value="arsa">Arsa</option>
+              <option value="tarla">Tarla / Tarım Arazisi</option>
+              <option value="daire" selected>Daire (Konut)</option>
+              <option value="villa">Villa / Müstakil</option>
+              <option value="isyeri">İşyeri / Ofis</option>
+              <option value="dukkan">Dükkan / Mağaza</option>
+              <option value="depo">Depo / Antrepo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ORTAK: ALAN -->
+        <div class="input-group">
+          <label class="input-label">Parsel Alanı (m²)</label>
+          <input type="number" id="alanInput" class="input-field" placeholder="500" min="1">
+        </div>
+
+        <!-- ═══════════════════════════════════
+             ARSA / TARLA PANELİ
+             ═══════════════════════════════════ -->
+        <div id="arsaPanel" style="display:none">
+
+          <!-- İmar Durumu -->
+          <div class="input-group">
+            <label class="input-label">İmar Durumu</label>
+            <div class="imar-toggle-group" id="imarToggle">
+              <button type="button" class="imar-btn active" data-val="imarsiz">
+                <span class="imar-dot red"></span> İmarsız
+              </button>
+              <button type="button" class="imar-btn" data-val="imarlı-konut">
+                <span class="imar-dot gold"></span> İmarlı — Konut
+              </button>
+              <button type="button" class="imar-btn" data-val="imarlı-ticari">
+                <span class="imar-dot blue"></span> İmarlı — Ticari
+              </button>
+              <button type="button" class="imar-btn" data-val="imarlı-karma">
+                <span class="imar-dot green"></span> İmarlı — Karma
+              </button>
+            </div>
+            <input type="hidden" id="imarDurumu" value="imarsiz">
+          </div>
+
+          <!-- İmarlı alt paneli -->
+          <div id="imarliPanel" style="display:none">
+
+            <!-- Kullanım & Kat Sayısı -->
+            <div class="input-row-2">
+              <div class="input-group">
+                <label class="input-label">Kat Sayısı (Ymax)</label>
+                <input type="number" id="katSayisi" class="input-field" placeholder="4" min="1" max="30">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Cephe Mesafesi (m)</label>
+                <input type="number" id="cepheMesafe" class="input-field" placeholder="5.0" min="0" step="0.5">
+              </div>
+            </div>
+
+            <!-- TAKS / KAKS -->
+            <div class="taks-kaks-row">
+              <div class="taks-kaks-item">
+                <label class="input-label">TAKS</label>
+                <div class="taks-input-wrap">
+                  <input type="number" id="taksInput" class="input-field taks-field" placeholder="0.40" min="0" max="1" step="0.01">
+                  <span class="taks-hint" id="taksHint">—</span>
+                </div>
+              </div>
+              <div class="taks-kaks-divider">÷</div>
+              <div class="taks-kaks-item">
+                <label class="input-label">KAKS (Emsal)</label>
+                <div class="taks-input-wrap">
+                  <input type="number" id="kaksInput" class="input-field taks-field" placeholder="1.50" min="0" max="10" step="0.05">
+                  <span class="taks-hint" id="kaksHint">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="taks-result-bar" id="taksResult" style="display:none">
+              <div class="taks-result-item">
+                <span class="taks-result-label">Taban Alanı</span>
+                <span class="taks-result-val" id="tabanAlanVal">—</span>
+              </div>
+              <div class="taks-result-item">
+                <span class="taks-result-label">İnşaat Alanı</span>
+                <span class="taks-result-val" id="insaatAlanVal">—</span>
+              </div>
+              <div class="taks-result-item">
+                <span class="taks-result-label">Emsalli Alan</span>
+                <span class="taks-result-val" id="emsalliAlanVal">—</span>
+              </div>
+            </div>
+
+            <!-- KAT DETAYLARI (ticari için) -->
+            <div id="katDetayPanel">
+              <div class="subsection-header">Kat Dağılımı <span class="input-optional">(opsiyonel)</span></div>
+              <div class="input-row-2">
+                <div class="input-group">
+                  <label class="input-label">Bodrum Kat (m²)</label>
+                  <input type="number" id="bodrumM2" class="input-field" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Asma Kat (m²)</label>
+                  <input type="number" id="asmaKatM2" class="input-field" placeholder="0" min="0">
+                </div>
+              </div>
+              <div class="input-row-2">
+                <div class="input-group">
+                  <label class="input-label">Zemin Kat (m²)</label>
+                  <input type="number" id="zeminM2" class="input-field" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Normal Kat (m²/kat)</label>
+                  <input type="number" id="normalKatM2" class="input-field" placeholder="0" min="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- TİCARİ SPESIFIK -->
+            <div id="ticariPanel" style="display:none">
+              <div class="subsection-header">Ticari Parametreler</div>
+              <div class="input-row-2">
+                <div class="input-group">
+                  <label class="input-label">Ticari Tavan (m)</label>
+                  <input type="number" id="tavanYukseklik" class="input-field" placeholder="4.5" min="2" max="20" step="0.5">
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Zemin Cephe (m)</label>
+                  <input type="number" id="zeminCephe" class="input-field" placeholder="10" min="0" step="0.5">
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /imarliPanel -->
+
+          <!-- Köşe Parsel Toggle -->
+          <div class="toggle-row" style="margin-top:10px">
+            <label class="toggle-label">
+              <input type="checkbox" id="koseParsel" class="toggle-input">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-text">Köşe Parsel</span>
+            </label>
+            <span class="badge badge-gold" id="koseBadge" style="display:none">+%5–10</span>
+          </div>
+
+          <!-- ALTYAPI -->
+          <div class="input-group" style="margin-top:10px">
+            <label class="input-label">Altyapı</label>
+            <div class="altyapi-grid">
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altYol" value="yol">
+                <span class="altyapi-icon">🛣</span>
+                <span>Yol</span>
+              </label>
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altSu" value="su">
+                <span class="altyapi-icon">💧</span>
+                <span>Su</span>
+              </label>
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altElektrik" value="elektrik">
+                <span class="altyapi-icon">⚡</span>
+                <span>Elektrik</span>
+              </label>
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altKanalizasyon" value="kanalizasyon">
+                <span class="altyapi-icon">♻</span>
+                <span>Kanalizasyon</span>
+              </label>
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altDogalgaz" value="dogalgaz">
+                <span class="altyapi-icon">🔥</span>
+                <span>Doğalgaz</span>
+              </label>
+              <label class="altyapi-chip">
+                <input type="checkbox" id="altFiber" value="fiber">
+                <span class="altyapi-icon">📶</span>
+                <span>Fiber</span>
+              </label>
+            </div>
+          </div>
+
+        </div><!-- /arsaPanel -->
+
+        <!-- ═══════════════════════════════════
+             KONUT / DİĞER PANELİ
+             ═══════════════════════════════════ -->
+        <div id="konutPanel">
+          <div class="input-row-2">
+            <div class="input-group" id="katRow">
+              <label class="input-label">Kat</label>
+              <input type="number" id="katInput" class="input-field" placeholder="3" min="-2">
+            </div>
+            <div class="input-group" id="konutRow">
+              <label class="input-label">Oda + Salon</label>
+              <div class="select-wrapper">
+                <select id="odaSelect" class="input-field select-field">
+                  <option value="1+0">1+0</option>
+                  <option value="1+1">1+1</option>
+                  <option value="2+1" selected>2+1</option>
+                  <option value="3+1">3+1</option>
+                  <option value="4+1">4+1</option>
+                  <option value="5+1">5+1</option>
+                  <option value="6+">6+</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Bina Yaşı</label>
+            <input type="number" id="yasiInput" class="input-field" placeholder="10" min="0" max="100">
+          </div>
+          <div class="input-group" id="cepheyiRow">
+            <label class="input-label">Özellikler</label>
+            <div class="chips-container" id="ozellikChips">
+              <label class="chip"><input type="checkbox" value="asansor"> Asansör</label>
+              <label class="chip"><input type="checkbox" value="otopark"> Otopark</label>
+              <label class="chip"><input type="checkbox" value="balkon"> Balkon</label>
+              <label class="chip"><input type="checkbox" value="siteicinde"> Site İçinde</label>
+              <label class="chip"><input type="checkbox" value="denizmanzara"> Deniz Manzarası</label>
+              <label class="chip"><input type="checkbox" value="esyali"> Eşyalı</label>
+              <label class="chip"><input type="checkbox" value="kombi"> Kombi</label>
+              <label class="chip"><input type="checkbox" value="deprem"> Yeni Deprem Yön.</label>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Aylık Kira (₺) <span class="input-optional">(gelir yaklaşımı)</span></label>
+            <input type="number" id="kiraInput" class="input-field" placeholder="25.000">
+          </div>
+        </div><!-- /konutPanel -->
+
+        <!-- ORTAK: TALEP FİYATI -->
+        <div class="input-group" style="margin-top:8px">
+          <label class="input-label">Talep / İlan Fiyatı (₺) <span class="input-optional">(opsiyonel)</span></label>
+          <input type="number" id="talepFiyatInput" class="input-field" placeholder="5.000.000">
+        </div>
+
+        <!-- STREET VIEW -->
+        <div class="streetview-container" id="streetviewContainer" style="display:none">
+          <div class="streetview-placeholder" id="streetviewPlaceholder">
+            <span class="sv-icon">⊙</span>
+            <span>Street View yükleniyor...</span>
+          </div>
+          <img id="streetviewImg" class="streetview-img" alt="Street View" style="display:none">
+        </div>
+      </div>
+
+      <!-- SECTION: EMSAL VERİLERİ -->
+      <div class="panel-section">
+        <div class="section-header">
+          <span class="section-icon">◈</span>
+          <span class="section-title">Emsal Verileri</span>
+          <button class="btn btn-gold btn-xs" id="fetchEmsalBtn">
+            <span class="btn-icon">⊞</span> Otomatik Çek
+          </button>
+        </div>
+
+        <div class="emsal-sources">
+          <span class="source-tag" data-source="sahibinden">Sahibinden</span>
+          <span class="source-tag" data-source="emlakjet">Emlakjet</span>
+          <span class="source-tag" data-source="hurriyet">Hürriyet</span>
+          <span class="source-tag" data-source="zingat">Zingat</span>
+          <span class="source-tag" data-source="hepsiemlak">Hepsiemlak</span>
+        </div>
+
+        <div class="emsal-list" id="emsalList">
+          <!-- Emsal rows injected by JS -->
+        </div>
+
+        <button class="btn btn-outline btn-sm" id="addEmsalBtn">
+          <span>＋</span> Emsal Ekle
+        </button>
+      </div>
+
+      <!-- ANALYZE BUTTON -->
+      <div class="analyze-block">
+        <button class="btn btn-gold btn-analyze" id="analyzeBtn">
+          <span class="analyze-icon">◈</span>
+          <span>Analizi Başlat</span>
+        </button>
+        <p class="analyze-note">Medyan + IQR metodolojisi</p>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content" id="mainContent">
+
+    <!-- WELCOME STATE -->
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-inner">
+        <div class="welcome-emblem">◈</div>
+        <h1 class="welcome-title">Gayrimenkul Pazar Analizi</h1>
+        <p class="welcome-sub">Kurumsal standartlarda emsal karşılaştırma ve değerleme</p>
+        <div class="welcome-features">
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>TKGM Entegrasyonu</span></div>
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>Medyan / IQR Analizi</span></div>
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>3 Değer Görüşü</span></div>
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>Risk & Fırsat Matrisi</span></div>
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>AI Destekli Analiz</span></div>
+          <div class="wf-item"><span class="wf-icon">⊕</span><span>PDF Rapor</span></div>
+        </div>
+        <p class="welcome-disclaimer">
+          <strong>SPK UYARISI:</strong> Bu rapor bilgilendirme amaçlıdır. Resmi değerleme raporu yerine geçmez.
+          Tüm değerler tahmindir. Yatırım kararlarında uzman görüşü alınız.
+        </p>
+      </div>
+    </div>
+
+    <!-- LOADING STATE -->
+    <div class="loading-state" id="loadingState" style="display:none">
+      <div class="loading-inner">
+        <div class="loading-emblem">◈</div>
+        <p class="loading-text" id="loadingText">Analiz hazırlanıyor...</p>
+        <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+        <p class="loading-sub" id="loadingSub">Emsal verileri işleniyor</p>
+      </div>
+    </div>
+
+    <!-- RESULTS STATE -->
+    <div class="results-state" id="resultsState" style="display:none">
+
+      <!-- RESULTS TABS -->
+      <div class="tabs-bar">
+        <button class="tab-btn active" data-tab="ozet">
+          <span class="tab-icon">◈</span> Özet
+        </button>
+        <button class="tab-btn" data-tab="emsal">
+          <span class="tab-icon">◈</span> Emsal Analizi
+        </button>
+        <button class="tab-btn" data-tab="deger">
+          <span class="tab-icon">◈</span> Değer Analizi
+        </button>
+        <button class="tab-btn" data-tab="risk">
+          <span class="tab-icon">◈</span> Risk & Fırsat
+        </button>
+        <button class="tab-btn" data-tab="rapor">
+          <span class="tab-icon">◈</span> Rapor
+        </button>
+      </div>
+
+      <!-- TAB: ÖZET -->
+      <div class="tab-pane active" id="tab-ozet">
+        <div class="tab-content-inner" id="ozetContent"></div>
+      </div>
+
+      <!-- TAB: EMSAL ANALİZİ -->
+      <div class="tab-pane" id="tab-emsal">
+        <div class="tab-content-inner" id="emsalContent"></div>
+      </div>
+
+      <!-- TAB: DEĞER ANALİZİ -->
+      <div class="tab-pane" id="tab-deger">
+        <div class="tab-content-inner" id="degerContent"></div>
+      </div>
+
+      <!-- TAB: RİSK & FIRSAT -->
+      <div class="tab-pane" id="tab-risk">
+        <div class="tab-content-inner" id="riskContent"></div>
+      </div>
+
+      <!-- TAB: RAPOR -->
+      <div class="tab-pane" id="tab-rapor">
+        <div class="tab-content-inner" id="raporContent"></div>
+        <div class="rapor-actions">
+          <button class="btn btn-gold" id="pdfBtn">
+            <span class="btn-icon">⊞</span> PDF İndir
+          </button>
+          <button class="btn btn-outline" id="emailBtn">
+            <span class="btn-icon">⊙</span> E-Posta ile Gönder
+          </button>
+          <button class="btn btn-outline" id="newAnalysisBtn">
+            <span class="btn-icon">⊕</span> Yeni Analiz
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- EMSAL DETAIL MODAL -->
+<div class="modal-overlay" id="emsalModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Emsal Detay</h3>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
